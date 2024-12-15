@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django import forms
+from django.template.context_processors import request
 from django.utils.timezone import now
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from .models import Task
 
@@ -34,16 +36,20 @@ class TaskForm(forms.ModelForm):
         return deadline
 
 # index view method: show all tasks
+@login_required
 def index(request):
-    latest_task_list = Task.objects.order_by("deadline")
+    latest_task_list = Task.objects.filter(user=request.user).order_by('deadline')
     context = {"latest_task_list": latest_task_list}
     return render(request, "todo/index.html", context)
 
 # create task view method: create new task
+@login_required
 def create_task(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
+            task = form.save(commit=False)
+            task.user = request.user
             form.save()
             messages.success(request,"Task created successfully!")
             return redirect(reverse('index'))
@@ -55,9 +61,10 @@ def create_task(request):
     return render(request, "todo/create_task.html", {'form': form})
 
 # deelete task by id
+@login_required
 def delete_task(request, task_id):
     try:
-        task = Task.objects.get(id=task_id)
+        task = Task.objects.get(id=task_id, user=request.user)
         task.delete()
         messages.success(request, "Task deleted successfully!")
     except Task.DoesNotExist:
@@ -66,9 +73,10 @@ def delete_task(request, task_id):
     return redirect(reverse('index'))
 
 # update task by id
+@login_required
 def update_task(request, task_id):
     try:
-        task = Task.objects.get(id=task_id)
+        task = Task.objects.get(id=task_id, user=request.user)
     except Task.DoesNotExist:
         messages.success(request, "Task does not exist!")
         return redirect(reverse('index'))
