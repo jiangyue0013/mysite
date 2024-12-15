@@ -4,7 +4,9 @@ from django.template.context_processors import request
 from django.utils.timezone import now
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import Task
 
@@ -93,3 +95,19 @@ def update_task(request, task_id):
         form = TaskForm(instance=task)
 
     return render(request, "todo/update_task.html", {'form': form, 'task': task})
+
+# register user
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, f"Welcome, {user.username}! Your account has been created.")
+            return redirect(reverse('index'))
+        else:
+            messages.error(request, "Registration failed. Please check the form.")
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'todo/register.html', {'form': form})
