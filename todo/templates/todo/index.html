@@ -1,38 +1,37 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Yue's to-do list.</title>
-        {% load static %}
+{% extends 'todo/base.html' %}
 
-        <link rel="stylesheet" href="{% static 'css/todo.css' %}">
-    </head>
-    <body>
-        {% if messages %}
-            <ul>
-            {% for message in messages %}
-                <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
+{% block title %}
+{{ user.username }}'s to-do List
+{% endblock %}
 
-        <h1>Yue's To-do List</h1>
+{% block css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/todo_index.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
 
-        <table>
-            <caption>To-do List</caption>
-            <a href="{% url 'create_task' %}" class="btn btn-primary">Create Task</a>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Describtion</th>
-                    <th>Deadline</th>
-                    <th>Created</th>
-                    <th>Updated</th>
-                    <th>Status</th>
-                    <th>Pority</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+{% block content %}
+<h1>Your to-do List</h1>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="table-caption">To-do List</h2>
+        <a href="{% url 'create_task' %}" class="btn btn-primary">Create Task</a>
+    </div>
+    <table class="table table-bordered table-hover text-center">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Deadline</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
             {% if latest_task_list %}
                 {% for task in latest_task_list %}
                     <tr>
@@ -42,17 +41,36 @@
                         <td>{{ task.deadline|date:"M d, Y" }}</td>
                         <td>{{ task.created_at|date:"M d, Y" }}</td>
                         <td>{{ task.updated_at|date:"M d, Y" }}</td>
-                        <td>{{ task.get_status_display }}</td>
-                        <td>{{ task.get_priority_display }}</td>
                         <td>
-                            <a href="{% url 'update_task' task.id %}" class="btn btn-warning">Edit</a>
-                            <a href="{% url 'delete_task' task.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                            {% if task.get_status_display == 'Completed' %}
+                                <span class="badge bg-success">{{ task.get_status_display }}</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ task.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.get_priority_display == 'High' %}
+                                <span class="badge bg-danger">{{ task.get_priority_display }}</span>
+                            {% elif task.get_priority_display == 'Medium' %}
+                                <span class="badge bg-primary">{{ task.get_priority_display }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ task.get_priority_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'update_task' task.id %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
                         </td>
                     </tr>
                 {% endfor %}
             {% else %}
-                <p>No polls are available.</p>
+                <tr>
+                    <td colspan="9" class="text-center text-muted">No tasks are available.</td>
+                </tr>
             {% endif %}
-        </table>
-    </body>
-</html>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

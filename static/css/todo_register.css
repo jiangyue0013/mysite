@@ -1,0 +1,16 @@
+main {
+    background-color: #f8f9fa; /* 修改背景颜色 */
+}
+
+.card {
+    border-radius: 10px; /* 圆角卡片 */
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}

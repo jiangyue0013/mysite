@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}default title{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/todo_base.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <ul class="nav-container">
+                <div class="nav-lright">
+                    <li class="nav-left"><a class="base-a" href="{% url 'index' %}">Your to-do List</a></li>
+                </div>
+                <div class="nav-right">
+                    {% if user.is_authenticated %}
+                        <li>{{ user.username }}</li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button class="nav-logout" type="submit">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a class="base-a" href="{% url 'login' %}">Log in</a></li>
+                        <li><a class="base-a" href="{% url 'register' %}">Register</a></li>
+                    {% endif %}
+                </div>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        {% if messages %}
+<div id="messages-container" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 50%;">
+    <ul id="messages" style="list-style: none; padding: 0; margin: 0;">
+        {% for message in messages %}
+        <li class="alert alert-{{ message.tags }} message-item" 
+            style="margin-bottom: 10px; padding: 15px; border-radius: 5px; position: relative; text-align: center;">
+            {{ message }}
+            <button type="button" class="close-btn" 
+                    style="position: absolute; top: 5px; right: 10px; background: none; border: none; font-size: 18px; cursor: pointer;">
+                &times;
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+        {% block content %}
+        <p>Default content</p>
+        {% endblock %}
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 3秒后自动隐藏消息
+            const messages = document.querySelectorAll('.message-item');
+            messages.forEach(function (message) {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    setTimeout(() => message.remove(), 300);
+                }, 3000);
+            });
+
+            // 手动关闭按钮
+            const closeButtons = document.querySelectorAll('.close-btn');
+            closeButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const messageItem = button.parentElement;
+                    messageItem.style.opacity = '0';
+                    setTimeout(() => messageItem.remove(), 300);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+table {
+    background-color: #f8f9fa;
+}
+th {
+    background-color: #007bff;
+    color: white;
+}
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+.btn {
+    margin-right: 5px;
+}
+.table-caption {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
